@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
-from lab02.linalg_interp import (
+sys.path.insert(1, '/goph419-f2023-lab02-stSL/src/lab02')
+
+from linalg_interp import (
     gauss_iter_solve,
     spline_function,
 )
@@ -38,6 +41,8 @@ def test_spline():
     xd=np.linspace(-5.0,5.0,10)
     yd=1.0+0.5*xd
 
+    #testing first order spline interpolation
+
     s1=spline_function(xd,yd,order=1)
     xp=np.linspace(-6.0,6.0,100)
     yp_exp=1.0+0.5*xp
@@ -51,14 +56,16 @@ def test_spline():
     eps_t=np.linalg.norm(yp_exp-yp_actual)/np.linalg.norm(yp_exp)
     plt.text(0.5,-1.0,f"eps_t={eps_t}")
     plt.legend()
-    plt.savefig("figures/test_linear.png")
+    plt.savefig("../figures/test_linear.png")
 
 
-    xd=np.linspace(-5.0,5.0,10)
+    #xd=np.linspace(-5.0,5.0,10)
     yd=1.0+0.5*xd+0.25*xd**2
 
+    #testing second order spline interpolation
+
     s2=spline_function(xd,yd,order=2)
-    xp=np.linspace(-6.0,6.0,100)
+    xp=np.linspace(-5.0,5.0,100)
     yp_exp=1.0+0.5*xp+0.25*xp**2
     yp_actual=np.array(
         [s2(x) for x in xp]
@@ -70,9 +77,25 @@ def test_spline():
     eps_t=np.linalg.norm(yp_exp-yp_actual)/np.linalg.norm(yp_exp)
     plt.text(0.5,-1.0,f"eps_t={eps_t}")
     plt.legend()
-    plt.savefig("figures/test_quadratic.png")
+    plt.savefig("../figures/test_quadratic.png")
+    
+    #testing third order spline interpolation
+    
+    s3=spline_function(xd,yd,order=3)
+    xp=np.linspace(-6.0,6.0,100)
+    yp_exp=1.0+0.5*xp+0.25*xp**2+0.125*xp**3
+    yp_actual=np.array(
+        [s3(x) for x in xp]
+    )
+
+    plt.figure()
+    plt.plot(xd,yd,"xr",label="data")
+    plt.plot(xp, yp_actual, "--k", label="s3")
+    eps_t=np.linalg.norm(yp_exp-yp_actual)/np.linalg.norm(yp_exp)
+    plt.text(0.5,-1.0,f"eps_t={eps_t}")
+    plt.legend()
+    plt.savefig("../figures/test_cubic.png")
 
 if __name__=="__main__":
-    test_gauss_iter_solve()
+    #test_gauss_iter_solve()
     test_spline()
-

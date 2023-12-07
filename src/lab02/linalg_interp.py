@@ -1,6 +1,6 @@
 import numpy as np
 
-def gauss_iter_solve(A,b,x0=None,tol=1e-15,alg="seidel"):
+def gauss_iter_solve(A,b,x0=None,tol=1e-8,alg="seidel"):
     """
     Description of function.
         Parameters
@@ -69,12 +69,12 @@ def spline_function(xd,yd,order=3):
     """
     Description of function.
         Parameters
-        xd:
-        yd:
-        order:
+        xd: x data (array-like)
+        yd: y data (array-like)
+        order: order of interpolation (int)
         ----------
         Returns
-        
+        s1, s2, s3: function of interpolation  
         -------
     """
     #make checks for dimensions for xd and yd
@@ -102,6 +102,9 @@ def spline_function(xd,yd,order=3):
         B=np.zeros_like(dx)
         B[1:]=np.diff(f1)
         c=np.linalg.solve(A,B)
+
+        #print(A,B)
+
         b=f1-c*dx
         def s2(x):
             k=(0 if x <= xd[0]
@@ -110,4 +113,24 @@ def spline_function(xd,yd,order=3):
             return a[k]+b[k]*(x-xd[k])+c[k]*(x-xd[k])**2
         return s2
     elif order==3:
-        pass
+        A=np.zeros((N,N))
+        #A[-2,-1]=dx[-1]
+        #A[1,0]=dx[0]
+        A[1:-1, :-2]+=np.diag(dx[:-1])
+        A[1:-1, 1:-1]+=2.0*(np.diag(dx[1:]+dx[:-1]))
+        A[1:-1, 2:]=+np.diag(dx[1:])
+        A[0,:3]=(-dx[1], (dx[0]+dx[1]), -dx[0])
+        A[-1,-3:]=(-dx[-1], (dx[-2]+dx[-1]), -dx[-2])
+        B=np.zeros(N)
+        B[1:-1]=3*np.diff(f1)
+        #print(A,B)
+
+        c=gauss_iter_solve(A,B)
+        d=(c[1:]-c[-1])/(3.0*dx)
+        b=f1-c[-1]*dx-d*(dx**2)
+        def s3(x):
+            k=(0 if x <= xd[0]
+               else len(a)-1 if x>=xd[-1]
+               else np.nonzero(xd<x)[0][-1])
+            return a[k]+b[k]*(x-xd[k])+c[k]*(x-xd[k])**2+d[k]*(x-xd[k])**3
+        return s3
