@@ -14,6 +14,7 @@ requires-python = ">=3.8"
 dependencies = [
 "numpy",
 "matplotlib",
+"scipy"
 ]
 classifiers = [
 "Programming Language :: Python :: 3",
@@ -22,4 +23,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/stephenliu-ucalgary/goph-419-lab02-stSL"
+"Homepage" = "https://github.com/stephenliu-ucalgary/goph419-lab02-stSL"

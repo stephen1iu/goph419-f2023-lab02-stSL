@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+#from scipy.interpolate import CubicSpline
 import sys
 
 sys.path.insert(1, '/goph419-f2023-lab02-stSL/src/lab02')
@@ -39,10 +40,10 @@ def test_gauss_iter_solve():
 
 def test_spline():
     xd=np.linspace(-5.0,5.0,10)
-    yd=1.0+0.5*xd
 
     #testing first order spline interpolation
 
+    yd=1.0+0.5*xd
     s1=spline_function(xd,yd,order=1)
     xp=np.linspace(-6.0,6.0,100)
     yp_exp=1.0+0.5*xp
@@ -58,14 +59,11 @@ def test_spline():
     plt.legend()
     plt.savefig("../figures/test_linear.png")
 
-
-    #xd=np.linspace(-5.0,5.0,10)
-    yd=1.0+0.5*xd+0.25*xd**2
-
     #testing second order spline interpolation
 
+    yd=1.0+0.5*xd+0.25*xd**2
     s2=spline_function(xd,yd,order=2)
-    xp=np.linspace(-5.0,5.0,100)
+    xp=np.linspace(-6.0,6.0,100)
     yp_exp=1.0+0.5*xp+0.25*xp**2
     yp_actual=np.array(
         [s2(x) for x in xp]
@@ -81,7 +79,9 @@ def test_spline():
     
     #testing third order spline interpolation
     
-    s3=spline_function(xd,yd,order=3)
+    yd=1.0+0.5*xd+0.25*xd**2+0.125*xd**3
+    s3=spline_function(xd,yd)
+    #s3=CubicSpline(xd,yd)
     xp=np.linspace(-6.0,6.0,100)
     yp_exp=1.0+0.5*xp+0.25*xp**2+0.125*xp**3
     yp_actual=np.array(

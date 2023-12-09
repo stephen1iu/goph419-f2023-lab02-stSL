@@ -29,7 +29,7 @@ def gauss_iter_solve(A,b,x0=None,tol=1e-8,alg="seidel"):
     dimb=len(b.shape)
     if dimb!=1:
         raise ValueError("b has {dimb} dimensions, should be 1")
-    #implement checks for the x0 if else statement
+   
     identity=np.eye(n)
 
     A_diag=np.diag(1.0/np.diag(A))
@@ -77,7 +77,12 @@ def spline_function(xd,yd,order=3):
         s1, s2, s3: function of interpolation  
         -------
     """
-    #make checks for dimensions for xd and yd
+    if len(xd)!=len(yd):
+        raise ValueError ("Data dimensions not equal")
+    xd_unique=np.unique(xd)
+    if len(xd_unique)!=len(xd):
+        raise ValueError ("Repetition of values in x data")
+    
     k_sort=np.argsort(xd)
     xd=np.array([xd[k] for k in k_sort])
     yd=np.array([yd[k] for k in k_sort])
@@ -94,6 +99,7 @@ def spline_function(xd,yd,order=3):
                else np.nonzero(xd<x)[0][-1])
             return a[k]+b[k]*(x-xd[k])
         return s1
+    
     elif order==2:
         A0=np.hstack([np.diag(dx[:-1]),np.zeros((N-2,1))])
         A1=np.hstack([np.zeros((N-2,1)),np.diag(dx[1:])])
@@ -102,9 +108,6 @@ def spline_function(xd,yd,order=3):
         B=np.zeros_like(dx)
         B[1:]=np.diff(f1)
         c=np.linalg.solve(A,B)
-
-        #print(A,B)
-
         b=f1-c*dx
         def s2(x):
             k=(0 if x <= xd[0]
@@ -112,25 +115,31 @@ def spline_function(xd,yd,order=3):
                else np.nonzero(xd<x)[0][-1])
             return a[k]+b[k]*(x-xd[k])+c[k]*(x-xd[k])**2
         return s2
+    #get zero along main diagonal?
+    #not indexing near the end correctly, especially 2nd last row?
     elif order==3:
         A=np.zeros((N,N))
-        #A[-2,-1]=dx[-1]
-        #A[1,0]=dx[0]
-        A[1:-1, :-2]+=np.diag(dx[:-1])
-        A[1:-1, 1:-1]+=2.0*(np.diag(dx[1:]+dx[:-1]))
-        A[1:-1, 2:]=+np.diag(dx[1:])
-        A[0,:3]=(-dx[1], (dx[0]+dx[1]), -dx[0])
-        A[-1,-3:]=(-dx[-1], (dx[-2]+dx[-1]), -dx[-2])
+        A[1,0]=dx[0]
+        A[-2,-1]=dx[-1]
+        A[0,:3]=[-dx[1], (dx[0]+dx[1]), -dx[-2]]
+        A[-1,-3:]=[-dx[-1], (dx[-1]+dx[-2]), -dx[-2]]
+        A[1:-1,:-2]=np.diag(dx[:-1])
+        A[1:-1,1:-1]=np.diag(2*(dx[:-1]+dx[1:]))
+        A[1:-1,2:]=np.diag(dx[1:])
+        print(A)
+
         B=np.zeros(N)
         B[1:-1]=3*np.diff(f1)
-        #print(A,B)
 
         c=gauss_iter_solve(A,B)
-        d=(c[1:]-c[-1])/(3.0*dx)
-        b=f1-c[-1]*dx-d*(dx**2)
+        d=np.diff(c)/(3.0*dx)
+        b=f1-c[:-1]*dx-d*dx**2
         def s3(x):
             k=(0 if x <= xd[0]
                else len(a)-1 if x>=xd[-1]
                else np.nonzero(xd<x)[0][-1])
             return a[k]+b[k]*(x-xd[k])+c[k]*(x-xd[k])**2+d[k]*(x-xd[k])**3
         return s3
+        
+    else:
+        return ValueError ("Invalid order, needs to be 1,2 or 3")
