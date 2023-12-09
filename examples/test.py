@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-#from scipy.interpolate import CubicSpline
 import sys
 
 sys.path.insert(1, '/goph419-f2023-lab02-stSL/src/lab02')
@@ -50,7 +49,6 @@ def test_spline():
     yp_actual=np.array(
         [s1(x) for x in xp]
     )
-
     plt.figure()
     plt.plot(xd,yd,"xr",label="data")
     plt.plot(xp, yp_actual, "--k", label="s1")
@@ -58,6 +56,7 @@ def test_spline():
     plt.text(0.5,-1.0,f"eps_t={eps_t}")
     plt.legend()
     plt.savefig("../figures/test_linear.png")
+    plt.show()
 
     #testing second order spline interpolation
 
@@ -68,7 +67,6 @@ def test_spline():
     yp_actual=np.array(
         [s2(x) for x in xp]
     )
-
     plt.figure()
     plt.plot(xd,yd,"xr",label="data")
     plt.plot(xp, yp_actual, "--k", label="s2")
@@ -76,18 +74,17 @@ def test_spline():
     plt.text(0.5,-1.0,f"eps_t={eps_t}")
     plt.legend()
     plt.savefig("../figures/test_quadratic.png")
+    plt.show()
     
     #testing third order spline interpolation
     
     yd=1.0+0.5*xd+0.25*xd**2+0.125*xd**3
-    s3=spline_function(xd,yd)
-    #s3=CubicSpline(xd,yd)
+    s3=spline_function(xd,yd,order=3)
     xp=np.linspace(-6.0,6.0,100)
     yp_exp=1.0+0.5*xp+0.25*xp**2+0.125*xp**3
     yp_actual=np.array(
         [s3(x) for x in xp]
     )
-
     plt.figure()
     plt.plot(xd,yd,"xr",label="data")
     plt.plot(xp, yp_actual, "--k", label="s3")
@@ -95,7 +92,8 @@ def test_spline():
     plt.text(0.5,-1.0,f"eps_t={eps_t}")
     plt.legend()
     plt.savefig("../figures/test_cubic.png")
+    plt.show()
 
 if __name__=="__main__":
-    #test_gauss_iter_solve()
+    test_gauss_iter_solve()
     test_spline()
