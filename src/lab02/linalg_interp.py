@@ -115,18 +115,14 @@ def spline_function(xd,yd,order=3):
                else np.nonzero(xd<x)[0][-1])
             return a[k]+b[k]*(x-xd[k])+c[k]*(x-xd[k])**2
         return s2
-    #get zero along main diagonal?
-    #not indexing near the end correctly, especially 2nd last row?
+    
     elif order==3:
-        A=np.zeros((N,N))
-        A[1,0]=dx[0]
-        A[-2,-1]=dx[-1]
-        A[0,:3]=[-dx[1], (dx[0]+dx[1]), -dx[-2]]
-        A[-1,-3:]=[-dx[-1], (dx[-1]+dx[-2]), -dx[-2]]
-        A[1:-1,:-2]=np.diag(dx[:-1])
-        A[1:-1,1:-1]=np.diag(2*(dx[:-1]+dx[1:]))
-        A[1:-1,2:]=np.diag(dx[1:])
-        print(A)
+        A =np.zeros((N,N))
+        A[1:-1,1:-1]+=np.diag(2*(dx[:-1]+dx[1:]))
+        A[1:-1,:-2]+= np.diag(dx[:-1])
+        A[1:-1,2:]+=np.diag(dx[1:])
+        A[0,:3]+=[-dx[1],dx[0]+dx[1],-dx[0]]
+        A[-1,-3:]+=[-dx[-1],dx[-1]+dx[-2],-dx[-2]]
 
         B=np.zeros(N)
         B[1:-1]=3*np.diff(f1)
