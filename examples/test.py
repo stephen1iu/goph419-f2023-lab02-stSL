@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
 import sys
 
 sys.path.insert(1, '/goph419-f2023-lab02-stSL/src/lab02')
@@ -93,6 +94,26 @@ def test_spline():
     plt.legend()
     plt.savefig("../figures/test_cubic.png")
     plt.show()
+
+    #comparing third order spline function to scipy spline
+
+    xd=np.linspace(0.5,10,50)
+    yd=np.exp(xd)
+    s3_sci=spline_function(xd,yd,order=3)
+    xp=np.linspace(0.5,10,50)
+    yp_actual=np.array(
+        [s3_sci(x) for x in xp]
+    )
+    sci_spline=UnivariateSpline(xd ,yd, k=3, s=0, ext='raise')
+    y_sci=sci_spline(xd)
+    plt.figure()
+    plt.plot(xd,yd,"xr",label="data")
+    plt.plot(xp, yp_actual, "--k", label="s3")
+    plt.plot(xp, y_sci, ".y", label="scipy spline")
+    plt.legend()
+    plt.savefig("../figures/compare_3_spline.png")
+    plt.show()
+
 
 if __name__=="__main__":
     test_gauss_iter_solve()
